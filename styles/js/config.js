@@ -36,7 +36,7 @@ charadex.sheet = {
     items:         "아이템",
     traits:        "특성",
     prompts:       "프롬프트",
-    gallery:       "갤러리",
+    loggallery:    "갤러리",
     faq:           "FAQ",
     staff:         "관리자",
   },
@@ -49,7 +49,7 @@ charadex.sheet = {
     species: ['전체', 'Dog', 'Cat', 'Bunny'],
     itemTypes: ['전체', 'Currency', 'MYO Slot', 'Pet', 'Trait', 'Misc'],
     traitTypes: ['전체', 'Ears', 'Eyes', 'Body', 'Limbs', 'Tails', 'Misc', 'Mutations'],
-    gallerytypes: ['전체', '일반', '프롬프트']
+    loggallerytypes: ['전체', '일반', '프롬프트']
 
   }
 
@@ -208,13 +208,13 @@ charadex.page.prompts = {
 };
 
 
-/* gallery
+/* loggallery
 /* --------------------------------------------------------------- */
-charadex.page.gallery = {
+charadex.page.loggallery = {
 
-  sheetPage: charadex.sheet.pages.gallery,
-  sitePage: 'gallery',
-  dexSelector: 'gallery',
+  sheetPage: charadex.sheet.pages.loggallery,
+  sitePage: 'loggallery',
+  dexSelector: 'loggallery',
   profileProperty: '갤러리',
 
   sort: {
