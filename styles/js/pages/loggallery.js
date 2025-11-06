@@ -1,16 +1,26 @@
+/* ==================================================================== */
+/* Import Charadex
+======================================================================= */
+import { charadex } from '../charadex.js';
 
-let dex = await charadex.initialize.page(
-null,
+
+/* ==================================================================== */
+/* Load
+======================================================================= */
+document.addEventListener("DOMContentLoaded", async () => {
+
+  let dex = await charadex.initialize.page(
+    null,
     charadex.page.loggallery,
-null, 
-async (listData) => {
+    null, 
+    async (listData) => {
 
       if (listData.type == 'loggallery') {
 
-// Create the log dex
+        // Create the log dex
         if (charadex.tools.checkArray(listData.loggalleryArray[0]['갤러리내역'])) {
-let logs = await charadex.initialize.page(
+          let logs = await charadex.initialize.page(
             listData.loggalleryArray[0]['갤러리내역'],
             charadex.page.loggallery.relatedData['갤러리 내역']
-);
-}
+          );
+        }
