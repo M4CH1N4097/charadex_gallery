@@ -225,12 +225,12 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
 
 };
 
-/* 글/그림 분리 - 갤러리/프로필 표시 규칙 보정 (지연 로딩 대응) */
+/* 글/그림 분리 - 갤러리/프로필 표시 규칙 안정화 */
 document.addEventListener('DOMContentLoaded', () => {
-  const workType  = (charadex?.sheet?.options?.['data-type'] || '').trim();  // '글' / 기타
-  const textlink0 = (charadex?.sheet?.options?.Textlink    || '').trim();
+  // 시트 옵션(있으면 사용)
+  const workTypeOpt  = (charadex?.sheet?.options?.['data-type'] || '').trim();
+  const textlinkOpt  = (charadex?.sheet?.options?.Textlink || '').trim();
 
-  // Google Docs → embed=true 로 바꿔서 iframe에 넣기
   const toEmbedded = (url) => {
     if (!url) return '';
     try {
@@ -239,96 +239,98 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!u.searchParams.has('embedded')) u.searchParams.set('embedded','true');
       }
       return u.toString();
-    } catch {
-      return url;
-    }
+    } catch { return url; }
   };
 
-  // img의 src가 나중에 채워질 수도 있으므로, 채워지는 순간 display를 켜준다.
-  const showImgWhenReady = (img) => {
-    if (!img) return;
-    const turnOn = () => { if (img.getAttribute('src')) img.style.display = 'block'; };
-    // 즉시 한 번 시도
-    turnOn();
-    // 이후 src 변화를 감시
-    new MutationObserver((muts, obs) => {
-      turnOn();
-      if (img.style.display === 'block') obs.disconnect();
-    }).observe(img, { attributes: true, attributeFilter: ['src'] });
-  };
-
-  // 1) 갤러리 아이템: 유형 무관, 항상 이미지 썸네일만 보이기
-  //    (iframe은 완전히 숨김)
-  const applyGalleryRule = (root = document) => {
-    // 갤러리 영역의 iframe은 전부 끈다
-    root.querySelectorAll('#charadex-gallery iframe').forEach(f => {
-      f.removeAttribute('src');
-      f.style.display = 'none';
-    });
-    // 갤러리 영역의 이미지들은 src가 들어오는 즉시 보이게
-    root.querySelectorAll('#charadex-gallery img.image').forEach(img => {
-      showImgWhenReady(img);
-    });
-  };
-
-  // 2) 프로필: 글이면 iframe(Textlink 임베드), 아니면 이미지
-  const applyProfileRule = (root = document) => {
-    const profile = root.querySelector('#charadex-profile');
-    if (!profile) return;
-
-    const iframeBox = profile.querySelector('.cd-loggallery-image-container[data-type="글"]');
-    const imageBox  = profile.querySelector('.cd-loggallery-image-container[data-type="그림"]');
-    const iframe    = iframeBox?.querySelector('iframe');
-    const img       = imageBox?.querySelector('img');
-
-    // 기본은 모두 숨김
-    if (iframe) { iframe.style.display = 'none'; }
-    if (img)    { img.style.display    = 'none'; }
-
-    if (workType === '글') {
-      // 글: iframe만 표시
-      if (iframe) {
-        const embedded = toEmbedded(textlink0);
-        iframe.src = embedded || '';
-        iframe.style.display = embedded ? 'block' : 'none';
-        // 퍼센트 높이는 부모 높이가 없으면 0이 되니 고정 뷰포트로
-        iframe.style.width  = '80%';
-        iframe.style.height = '80vh';
-        iframe.style.border = '0';
-      }
-      if (img) { img.style.display = 'none'; img.removeAttribute('src'); }
-    } else {
-      // 글이 아님: 이미지 표시, iframe은 끄기
-      if (iframe) { iframe.removeAttribute('src'); iframe.style.display = 'none'; }
-      if (img)    { showImgWhenReady(img); }
-    }
-  };
-
-  // 최초 적용
-  applyGalleryRule(document);
-  applyProfileRule(document);
-
-  // 나중에 DOM이 추가/교체되어도 자동으로 다시 적용
-  const target = document.body;
-  const obs = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      m.addedNodes.forEach(node => {
-        if (!(node instanceof HTMLElement)) return;
-        // 갤러리 쪽 변경
-        if (node.id === 'charadex-gallery' || node.querySelector?.('#charadex-gallery')) {
-          applyGalleryRule(node);
-        }
-        // 프로필 쪽 변경
-        if (node.id === 'charadex-profile' || node.querySelector?.('#charadex-profile')) {
-          applyProfileRule(node);
-        }
-        // 개별 카드/이미지가 동적으로 추가되는 경우도 커버
-        node.querySelectorAll?.('img.image').forEach(showImgWhenReady);
+  /* 규칙 1) 갤러리: 유형 무관, 항상 이미지 썸네일 노출 */
+  const applyGallery = (root=document) => {
+    root.querySelectorAll('#charadex-gallery .cd-loggallery-card img.image')
+      .forEach(img => {
+        if (img.src && img.src.trim() !== '') img.style.display = 'block';
       });
+  };
+
+  /* 규칙 2) 프로필: 
+     - data-type이 '글'이면 iframe만 (Textlink 임베드), 이미지 숨김
+     - 그 외엔 이미지만, iframe 숨김
+     - 시트 옵션이 있으면 우선 사용, 없으면 컨테이너의 data-type 사용 */
+  const applyProfile = (root=document) => {
+    root.querySelectorAll('#charadex-profile .cd-loggallery-image-container')
+      .forEach(box => {
+        const iframe = box.querySelector('iframe');
+        const img    = box.querySelector('img');
+        const typeFromAttr = (box.getAttribute('data-type') || '').trim();
+        const isTextType   = (workTypeOpt || typeFromAttr) === '글';
+
+        // 기본 숨김
+        if (iframe) iframe.style.display = 'none';
+        if (img)    img.style.display = 'none';
+
+        if (isTextType) {
+          if (iframe) {
+            const url = toEmbedded(textlinkOpt);
+            // Textlink가 있으면 설정해서 보이기
+            if (url) iframe.src = url;
+            iframe.style.display = url ? 'block' : 'none';
+            iframe.setAttribute('width','80%');
+            iframe.setAttribute('height','80%');
+            iframe.style.border = '0';
+          }
+          if (img) {
+            // 글 타입에선 이미지 비노출
+            img.style.display = 'none';
+          }
+        } else {
+          // 글이 아닌 타입: 이미지 우선 노출
+          if (iframe) { iframe.removeAttribute('src'); iframe.style.display = 'none'; }
+          if (img && img.src && img.src.trim() !== '') {
+            img.style.display = 'block';
+          }
+        }
+      });
+  };
+
+  // 최초 1회
+  applyGallery(document);
+  applyProfile(document);
+
+  // 변화에 재적용 (동적 로딩 대응)
+  const target = document.body;
+  const observer = new MutationObserver((mutations) => {
+    let needGallery = false;
+    let needProfile = false;
+
+    for (const m of mutations) {
+      // 노드 추가/제거로 구조가 바뀐 경우
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(node => {
+          if (!(node instanceof HTMLElement)) return;
+          if (node.closest?.('#charadex-gallery') || node.matches?.('#charadex-gallery')) needGallery = true;
+          if (node.closest?.('#charadex-profile') || node.matches?.('#charadex-profile')) needProfile = true;
+        });
+      }
+      // img의 src가 바뀌는 경우
+      if (m.type === 'attributes' && m.attributeName === 'src') {
+        const el = m.target;
+        if (el instanceof HTMLImageElement) {
+          if (el.closest('#charadex-gallery')) needGallery = true;
+          if (el.closest('#charadex-profile')) needProfile = true;
+        }
+      }
     }
+
+    if (needGallery) applyGallery(document);
+    if (needProfile) applyProfile(document);
   });
-  obs.observe(target, { childList: true, subtree: true });
+
+  observer.observe(target, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['src']
+  });
 });
+
 
 
 export { charadex };
