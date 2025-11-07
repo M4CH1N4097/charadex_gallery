@@ -332,22 +332,5 @@
 
 <script type="module" src="./styles/js/charadex.js"></script>
 
-<!-- ↓↓↓ 새로 추가 -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const type = charadex.sheet.pages.loggallery['data-type'];
-  const profile = document.querySelector('#charadex-profile');
-  if (!profile) return;
-
-  // 글이면 data-type 속성 붙이기
-  profile.setAttribute('data-type', type);
-
-  // iframe src 채우기
-  if (type === '글') {
-    const iframe = profile.querySelector('iframe');
-    if (iframe) iframe.src = charadex.sheet.pages.loggallery.Textlink;
-  }
-});
-</script>
 </body>
 </html>
