@@ -709,6 +709,7 @@ p:last-child {
   #charadex-profile[data-type="글"] img.image {
     display: none !important;
   }
+
   /* 글이 아닐 때 iframe 숨김 */
   #charadex-profile:not([data-type="글"]) iframe {
     display: none !important;
