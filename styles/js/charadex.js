@@ -228,4 +228,23 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
 
 };
 
+  /* 글 그림 분리
+  ======================================================================= */
+<script>
+document.querySelectorAll('.cd-loggallery-image-container').forEach(el => {
+  const type = el.dataset.type;
+  const iframe = el.querySelector('iframe');
+  const img = el.querySelector('img');
+  
+  if (type === '글') {
+    if (iframe) iframe.style.display = 'block';
+    if (img) img.style.display = 'none';
+  } else if (type === '그림') {
+    if (iframe) iframe.style.display = 'none';
+    if (img) img.style.display = 'block';
+  }
+});
+</script>
+
+
 export { charadex };
