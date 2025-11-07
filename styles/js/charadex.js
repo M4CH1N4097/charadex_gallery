@@ -228,25 +228,31 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
 /* 글 그림 분리
 ======================================================================= */
 document.addEventListener('DOMContentLoaded', () => {
-  // 시트에서 설정된 작품 유형 불러오기
   const workType = charadex?.sheet?.options?.['data-type']?.trim?.() || '';
+  const textlink = charadex?.sheet?.options?.Textlink?.trim?.() || '';
 
   document.querySelectorAll('.cd-loggallery-image-container').forEach(el => {
     const iframe = el.querySelector('iframe');
     const img = el.querySelector('img');
 
-    // 일단 모두 숨김
+    // 기본: 모두 숨김
     if (iframe) iframe.style.display = 'none';
     if (img) img.style.display = 'none';
 
-    // 작품 유형이 '글'인 경우 iframe 표시
     if (workType === '글') {
-      if (iframe && iframe.src && iframe.src.trim() !== '') {
-        iframe.style.display = 'block';
+      // 글: iframe만, Textlink로 교체 주입
+      if (iframe) {
+        iframe.src = textlink || '';        // 시트 Textlink 강제 적용
+        iframe.style.display = textlink ? 'block' : 'none';
       }
-    } 
-    // 작품 유형이 '글'이 아닌 경우 (예: 그림, 사진 등) 이미지 표시
-    else {
+      if (img) img.style.display = 'none';  // 이미지 숨김
+    } else {
+      // 글 이외: iframe 확실히 숨기고 src 비워 플레이스홀더 차단
+      if (iframe) {
+        iframe.src = '';
+        iframe.style.display = 'none';
+      }
+      // 이미지가 있으면 표시
       if (img && img.src && img.src.trim() !== '') {
         img.style.display = 'block';
       }
@@ -255,3 +261,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 export { charadex };
+
