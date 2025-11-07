@@ -705,14 +705,22 @@ p:last-child {
   max-height: 400px;
 }
 
-  /* 글이면 이미지 강제 숨김 */
-  #charadex-profile[data-type="글"] img.image {
-    display: none !important;
-  }
-
-  /* 글이 아닐 때 iframe 숨김 */
-  #charadex-profile:not([data-type="글"]) iframe {
-    display: none !important;
+/* 글일 땐 이미지 완전 차단, iframe만 표시 */
+#charadex-profile[data-type="글"] img.image {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+}
+#charadex-profile[data-type="글"] iframe {
+  display: block !important;
+  border: 0;
+  width: 80%;
+  height: 80vh;
+  margin: 0 auto;
   }
 
 /* Traits */
