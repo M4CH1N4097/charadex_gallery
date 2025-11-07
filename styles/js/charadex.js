@@ -226,10 +226,11 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  const type = charadex.sheet.pages.loggallery['data-type'];
-  const profile = document.querySelector('#charadex-profile');
-  if (profile) profile.setAttribute('data-type', type);
-});
+  setTimeout(() => {
+    const logData = charadex?.sheet?.pages?.loggallery;
+    const profile = document.querySelector('#charadex-profile');
+    if (logData && profile) profile.setAttribute('data-type', logData['data-type']);
+  }, 800);
 
 
 export { charadex };
