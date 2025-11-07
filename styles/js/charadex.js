@@ -222,5 +222,7 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
   };
 
   return handleGallery();
+  
+  };
 
 export { charadex };
