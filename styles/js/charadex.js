@@ -231,24 +231,22 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
   /* 글 그림 분리
   ======================================================================= */
 <script>
-document.querySelectorAll('.cd-loggallery-image-container').forEach(el => {
-  const type = el.dataset.type;
-  const iframe = el.querySelector('iframe');
-  const img = el.querySelector('img');
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.cd-loggallery-image-container').forEach(function (el) {
+    const type = el.dataset.type;
+    const f = el.querySelector('iframe');
+    const i = el.querySelector('img');
 
-  if (type === '글') {
-    if (iframe && el.dataset.textlink) {
-      iframe.src = el.dataset.textlink;
-      iframe.style.display = 'block';
+    if (type === '글') {
+      if (i) i.style.display = 'none';
+      // src가 실제로 채워진 경우에만 표시
+      if (f && f.getAttribute('src')) f.style.display = 'block';
+    } else if (type === '그림') {
+      if (f) f.style.display = 'none';
+      // src가 실제로 채워진 경우에만 표시
+      if (i && i.getAttribute('src')) i.style.display = 'block';
     }
-    if (img) img.style.display = 'none';
-  } else if (type === '그림') {
-    if (img && el.dataset.src) {
-      img.src = el.dataset.src;
-      img.style.display = 'block';
-    }
-    if (iframe) iframe.style.display = 'none';
-  }
+  });
 });
 </script>
 
