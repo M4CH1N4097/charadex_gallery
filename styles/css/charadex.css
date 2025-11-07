@@ -705,20 +705,17 @@ p:last-child {
   max-height: 400px;
 }
 
-/*글일때 iframe 추가*/
-#charadex-profile iframe.added-iframe {
-  display: block;
-  margin: 0 auto;
+/* 공통 iframe 스타일 */
+#charadex-profile iframe {
   border: 0;
   width: 80%;
   height: 80vh;
+  margin: 0 auto;
 }
 
-/*글 아니면 iframe용 공백 제거*/
-#charadex-profile:not([data-type="글"]) iframe.added-iframe {
+/* 그림일 땐 iframe 완전 숨김 */
+#charadex-profile[data-type="그림"] iframe {
   display: none !important;
-  height: 0 !important;
-  margin: 0 !important;
 }
   
 
