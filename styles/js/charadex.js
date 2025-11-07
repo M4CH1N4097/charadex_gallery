@@ -225,6 +225,36 @@ charadex.initialize.groupGallery = async function (config, dataArray, groupBy, c
 
 };
 
+// === 글/그림 카드 토글 ===
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const type = (charadex?.sheet?.pages?.loggallery?.['data-type'] || '').trim();
+
+    const imgCard = document.querySelector('#charadex-profile img.image');
+    const iframeCard = document.querySelector('#charadex-profile iframe');
+
+    if (!imgCard || !iframeCard) return;
+
+    // 기본 모두 숨김
+    imgCard.style.display = 'none';
+    iframeCard.style.display = 'none';
+
+    if (type === '글') {
+      // 글 → iframe만 보이기
+      iframeCard.style.display = 'block';
+      iframeCard.src = iframeCard.src || (charadex.sheet.pages.loggallery.Textlink || '');
+    } else {
+      // 글 아님 → 이미지 보이기
+      imgCard.style.display = 'block';
+      imgCard.src = imgCard.src || (charadex.sheet.pages.loggallery.Image || '');
+    }
+
+  } catch (e) {
+    console.error('카드 표시 중 오류:', e);
+  }
+});
+
+
 
 export { charadex };
 
