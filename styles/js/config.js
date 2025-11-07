@@ -254,7 +254,7 @@ charadex.page.loggallery = {
 charadex.page.staff = {
 
   sheetPage: charadex.sheet.pages.staff,
-  sitePage: 'staff',
+  sitePage: 'inventories',
   dexSelector: 'charadex',
   profileProperty: '닉네임',
 
