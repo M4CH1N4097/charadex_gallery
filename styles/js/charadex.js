@@ -237,40 +237,39 @@ window.addEventListener('load', () => {
 });
 
 
-// 글이면 이미지+iframe, 그림이면 이미지만 (DOM 기반)
-window.addEventListener('load', () => {
+/* 글/그림 분리 - 현재 표시 중인 프로필 데이터 기준 */
+document.addEventListener('DOMContentLoaded', () => {
   const profile = document.querySelector('#charadex-profile');
   if (!profile) return;
 
-  // 렌더 완료된 프로필의 "작품 유형" 값을 그대로 읽음
-  const typeTxt = (profile.querySelector('.data-type')?.textContent || '').trim();
-  if (!typeTxt) return;                      // 아직 렌더 전이면 패스
-  profile.setAttribute('data-type', typeTxt); // CSS 조건용
+  // 실제 표시 중인 데이터 가져오기
+  const data = window.charadexCurrentData;
+  if (!data) return;
 
+  const type = (data['data-type'] || '').trim();
+  const link = (data['Textlink'] || '').trim();
+
+  // 타입 설정
+  profile.setAttribute('data-type', type);
+
+  // 요소 찾기
   const iframe = profile.querySelector('iframe');
-  const img    = profile.querySelector('img.image');
+  const img = profile.querySelector('img.image');
 
-  if (typeTxt === '글') {
-    // 가능한 링크 후보를 간단히 확보: (이미 들어있으면 그대로 사용)
-    let link = (iframe?.getAttribute('src') || '').trim();
-    // window.charadexCurrentData에 Textlink가 있으면 우선 사용
-    if (window.charadexCurrentData?.Textlink) link = window.charadexCurrentData.Textlink.trim();
-
-    // Google Docs는 임베드형으로 보정
-    if (link.includes('docs.google.com') && link.includes('/edit')) {
-      link = link.replace('/edit', '/preview');
-      if (!link.includes('embedded=true')) link += (link.includes('?') ? '&' : '?') + 'embedded=true';
-    }
-
-    if (iframe && link) {
+  // iframe 링크 처리
+  if (iframe) {
+    if (type === '글' && link) {
       iframe.src = link;
       iframe.style.display = 'block';
+    } else {
+      iframe.src = '';
+      iframe.style.display = 'none';
     }
-    if (img) img.style.display = '';   // 글일 땐 이미지도 함께 보이게 (요구사항)
-  } else {
-    // 글이 아니면 iframe은 확실히 숨김
-    if (iframe) { iframe.removeAttribute('src'); iframe.style.display = 'none'; }
-    // 이미지는 그대로
+  }
+
+  // 이미지 표시 처리
+  if (img) {
+    img.style.display = (type === '글') ? 'none' : 'block';
   }
 });
 
