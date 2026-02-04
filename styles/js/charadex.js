@@ -15,7 +15,7 @@ charadex.initialize = {};
 /* Page
 /* ==================================================================== */
 charadex.initialize.page = async (dataArr, config, dataCallback, listCallback, customPageUrl = false) => {
-
+  
   if (!config) return console.error('No configuration added.');
 
   // Set up
@@ -148,7 +148,7 @@ charadex.initialize.page = async (dataArr, config, dataCallback, listCallback, c
 /* Grouped Gallery (Mostly for inventory items)
 /* ==================================================================== */
 charadex.initialize.groupGallery = async function (config, dataArray, groupBy, customPageUrl = false) {
-
+  
   /* Check the Configs */
   if (!config) return console.error(`No config added.`);
   
@@ -264,4 +264,3 @@ if (typeof window !== 'undefined') {
 }
 
 export { charadex };
-
