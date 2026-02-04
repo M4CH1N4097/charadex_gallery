@@ -16,6 +16,16 @@ charadex.initialize = {};
 /* ==================================================================== */
 charadex.initialize.page = async (dataArr, config, dataCallback, listCallback, customPageUrl = false) => {
 
+    // Add profile information
+  for (let entry of charadexData) {
+    charadex.tools.addProfileLinks(entry, pageUrl, config.profileProperty);
+
+    // Image 썸네일 추가
+    if (entry['data-type'] !== '글') {
+      entry.thumbnail = entry['Image'] || ''; // 썸네일 추가
+    }
+  }
+  
   if (!config) return console.error('No configuration added.');
 
   // Set up
@@ -149,6 +159,16 @@ charadex.initialize.page = async (dataArr, config, dataCallback, listCallback, c
 /* ==================================================================== */
 charadex.initialize.groupGallery = async function (config, dataArray, groupBy, customPageUrl = false) {
 
+    // Add profile information
+  for (let entry of charadexData) {
+    charadex.tools.addProfileLinks(entry, pageUrl, config.profileProperty);
+    
+    // Image 썸네일 추가
+    if (entry['data-type'] !== '글') {
+      entry.thumbnail = entry['Image'] || ''; // 썸네일 추가
+    }
+  }
+  
   /* Check the Configs */
   if (!config) return console.error(`No config added.`);
   
@@ -259,6 +279,38 @@ if (typeof window !== 'undefined') {
     } else if (iframe) {
       iframe.removeAttribute('src');
       iframe.style.display = 'none';
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    const data = window.charadexCurrentData;
+    const profile = document.querySelector('#charadex-profile');
+    if (!data || !profile) return;
+
+    const type = (data['data-type'] || '').trim();
+    const link = (data['Textlink'] || '').trim();
+    const iframe = profile.querySelector('iframe');
+    const imageContainer = profile.querySelector('.cd-loggallery-image-container img');
+
+    // CSS가 인식하도록 data-type 부여
+    profile.setAttribute('data-type', type);
+
+    // 글일 때 iframe src 채우고 보이게
+    if (type === '글' && iframe) {
+      if (link) iframe.src = link;
+      iframe.style.display = 'block';
+      imageContainer.style.display = 'none'; // 이미지 숨김
+    } else if (iframe) {
+      iframe.removeAttribute('src');
+      iframe.style.display = 'none'; // iframe 숨김
+    }
+
+    // 글이 아닐 경우 이미지 표시
+    if (type !== '글' && imageContainer) {
+      imageContainer.src = data['Image'] || ''; // 이미지 설정
+      imageContainer.style.display = 'block'; // 이미지 표시
     }
   });
 }
